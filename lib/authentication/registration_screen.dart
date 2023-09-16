@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/route_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:tiktok_clone/authentication/authentication_controller.dart';
 import 'package:tiktok_clone/authentication/login_screen.dart';
+import 'package:tiktok_clone/global.dart';
 import 'package:tiktok_clone/widgets/input_text_widget.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({super.key});
+  const RegistrationScreen({Key? key});
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  TextEditingController userNameTextEditingController = TextEditingController();
-  TextEditingController emailTextEditingController = TextEditingController();
-  TextEditingController passwordTextEditingController = TextEditingController();
-  bool showProgressBar = false;
+  final TextEditingController userNameTextEditingController =
+      TextEditingController();
+  final TextEditingController emailTextEditingController =
+      TextEditingController();
+  final TextEditingController passwordTextEditingController =
+      TextEditingController();
 
-  var authenticationController = AuthenticationController.instanceAuth;
+  final AuthenticationController authenticationController =
+      AuthenticationController.instanceAuth;
 
   @override
   Widget build(BuildContext context) {
@@ -42,30 +45,28 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               ),
               Text(
                 "To get started now!",
-                style: GoogleFonts.acme( 
+                style: GoogleFonts.acme(
                   fontSize: 34,
                   color: Colors.grey,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               GestureDetector(
-                onTap: (){
-                  // allow user to choose image
+                onTap: () {
                   authenticationController.chooseImageFromGallery();
-                  // Get.put(AuthenticationController());
                 },
-                child: const CircleAvatar(
+                child: CircleAvatar(
                   radius: 80,
-                  backgroundImage: AssetImage(
-                    "assets/images/avatar.jpeg"
-                    ),
-                     backgroundColor:Colors.black
+                  backgroundImage: authenticationController.profileImage !=
+                          null
+                      ? FileImage(authenticationController.profileImage!)
+                      : AssetImage("assets/images/avatar.jpeg") as ImageProvider<Object>?,
+                  backgroundColor: Colors.black,
                 ),
               ),
               const SizedBox(
                 height: 30,
               ),
-              // username input
               Container(
                 width: MediaQuery.of(context).size.width,
                 margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -76,11 +77,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   isObscure: false,
                 ),
               ),
-
               const SizedBox(
                 height: 25,
               ),
-              // email input
               Container(
                 width: MediaQuery.of(context).size.width,
                 margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -94,10 +93,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               const SizedBox(
                 height: 25,
               ),
-
-              // profile avatar
-
-              
               Container(
                 width: MediaQuery.of(context).size.width,
                 margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -128,6 +123,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               setState(() {
                                 showProgressBar = true;
                               });
+
+                              if (authenticationController.profileImage !=
+                                          null &&
+                                      userNameTextEditingController.text
+                                          .isNotEmpty &&
+                                      emailTextEditingController.text
+                                          .isNotEmpty &&
+                                      passwordTextEditingController.text
+                                          .isNotEmpty) {
+                                authenticationController.createAccountForNewUser(
+                                  authenticationController.profileImage!,
+                                  userNameTextEditingController.text,
+                                  emailTextEditingController.text,
+                                  passwordTextEditingController.text,
+                                );
+                              }
                             },
                             child: const Center(
                               child: Text(
@@ -147,7 +158,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                           const Text(
+                            const Text(
                               "Already have an Account? ",
                               style: TextStyle(
                                 fontSize: 16,
@@ -170,8 +181,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           ],
                         )
                       ],
-                    ):  Container(
-                      // show animations
+                    )
+                  : Container(
                       child: const SimpleCircularProgressBar(
                         progressColors: [
                           Colors.green,
@@ -182,13 +193,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           Colors.teal,
                           Colors.pink,
                           Colors.limeAccent,
-
                         ],
                         animationDuration: 3,
                         backColor: Colors.white,
                       ),
-                    )
-                  // : const CircularProgressIndicator(), // Show a progress indicator when logging in
+                    ),
             ],
           ),
         ),
